@@ -1,44 +1,28 @@
-const http = require('http');
-const { readFileSync } = require('fs');
+const express = require('express');
+const path = require('path');
 
-// get all files
-const homePage = readFileSync('./navbar-app/index.html');
-const homeStyles = readFileSync('./navbar-app/styles.css');
-const homeImages = readFileSync('./navbar-app/logo.svg');
-const homeLogic = readFileSync('./navbar-app/browser-app.js');
+const app = express();
 
-const server = http.createServer((req, res) => {
-    const url = req.url;
-    console.log('url', url);
+// setup static and middleware
+// express.static() is a built-in middleware
+// static asset: asset that the server doesnot needs to change it
+app.use(express.static('public'))
 
-    if (url === '/') {
-        res.writeHead(200, { 'content-type': 'text/html' });
-        res.write(homePage);
-        res.end();
-    } else if(url === '/about') {
-        res.writeHead(200, { 'content-type': 'text/html' });
-        res.write('<h1>About page!!!</h1>');
-        res.end();
-        // styles
-    } else if(url === '/styles.css') {
-        res.writeHead(200, { 'content-type': 'text/css' });
-        res.write(homeStyles);
-        res.end();
-        // image/logo
-    } else if(url === '/logo.svg') {
-        res.writeHead(200, { 'content-type': 'image/svg+xml' });
-        res.write(homeImages);
-        res.end();
-        // logic
-    } else if(url === '/browser-app.js') {
-        res.writeHead(200, { 'content-type': 'text/javascript' });
-        res.write(homeLogic);
-        res.end();
-    } else {
-        res.writeHead(404, { 'content-type': 'text/html' });
-        res.write('<h1>Page not found!!!</h1>');
-        res.end();
-    }
-});
+// #Note: template engines: Server side rendering or SSR
 
-server.listen(5000);
+// Since index.html is a initial static assets
+// we can just dump it into the public folder
+// And automatically it will get imported
+// index.html will serve as root so when the user hits the server
+// the server will serve index.html by default
+// app.get('/', (req, res) => {
+//     res.sendFile(path.resolve(__dirname, './navbar-app/index.html'));
+// })
+
+app.all('*', (req, res) => {
+    res.status(404).send('<h1>resource not found!!!</h1>');
+})
+
+app.listen(5000, () => {
+    console.log('server is listening on port 5000...');
+})
