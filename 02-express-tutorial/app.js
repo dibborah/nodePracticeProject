@@ -1,45 +1,26 @@
 const express = require('express');
-const { products } = require('./data');
 const app = express();
 
-// app.get('/', (req, res) => {
-//     // res.json([{ name: 'susan' }, { name : 'john' }]);
-//     res.json(products);
+const people = require('./routes/people');
+const auth = require('./routes/auth');
+
+// static assets
+app.use(express.static('./methods-public1'))
+
+// // parse form data
+app.use(express.urlencoded({ extended: false }));
+
+// // parse json
+app.use(express.json())
+
+app.use('/api/people', people);
+
+app.use('/login', auth);
+
+// app.all('*', (req, res) => {
+//     res.status(404).send('resource not found !!!');
 // })
 
-// default 404 response from express when the resource is not found
-
-app.get('/', (req, res) => {
-    res.send('<h1>Home page</h1><a href="/api/products">products</a>');
-})
-
-app.get('/api/products', (req, res) => {
-    const newProducts = products.map((product) => {
-        const {id, image, name} = product;
-        return {id, image, name};
-    })
-    res.send(newProducts);
-    // res.send(products);
-})
-
-// using route parameters or route params or placeholders
-app.get('/api/products/:productID', (req, res) => {
-    console.log('productID', req.params.productID);
-    const singleProduct = products.find((product) => (
-        product.id === +req.params.productID
-    ))
-    if(!singleProduct) {
-        res.send('Product does not exist!!!');
-    }
-    res.send(singleProduct);
-})
-
-// : are route parameter or placehoders
-app.get('/api/products/:productID/reviews/:reviewsID', (req, res) => {
-    console.log(req.params);
-    res.send("Hello world!!!");
-})
-
-app.listen( 5000, (req, res) => {
-    console.log('server is listening in port 5000...');
+app.listen(5000, (req, res) => {
+    console.log('Server is listening in port 5000...');
 })
